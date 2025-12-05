@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -20,6 +21,11 @@ export default function Home() {
         <h1 className="text-3xl font-bold font-sans text-center mb-8 text-blue-600">
           Toko Fullstack Jiha
         </h1>
+        <div className="flex justify-center mb-6">
+          <Link href="/add" className="bg-green-500 text-white px-6 py-2 rounded-full font-semibold hover:bg-green-600 transition">
+            + Tambah Produk
+          </Link>
+        </div>
 
         <div className="grid gap-4 font-sans">
           {products.map((item) => (
