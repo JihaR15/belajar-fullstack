@@ -1,7 +1,12 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
 const express = require('express');
 const sql = require('mssql');
 const cors = require('cors');
 const app = express();
+
+const SECRET_KEY = "kuncirahasia";
 
 app.use(cors()); 
 app.use(express.json()); 
@@ -73,6 +78,65 @@ app.get('/api/products/:id', async (req, res) => {
     try {
         const result = await sql.query`SELECT * FROM Products WHERE ID = ${id}`;
         res.json(result.recordset[0]); 
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+// Route: Register (Daftar Akun Baru)
+app.post('/api/auth/register', async (req, res) => {
+    const { username, password, nama } = req.body;
+
+    try {
+        const checkUser = await sql.query`SELECT * FROM Users WHERE Username = ${username}`;
+        if (checkUser.recordset.length > 0) {
+            return res.status(400).json({ message: 'Username sudah dipakai!' });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        await sql.query`INSERT INTO Users (Username, Password, NamaLengkap) 
+                        VALUES (${username}, ${hashedPassword}, ${nama})`;
+
+        res.json({ message: 'Registrasi berhasil! Silakan login.' });
+
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+// Route: Login (Masuk)
+app.post('/api/auth/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const userResult = await sql.query`SELECT * FROM Users WHERE Username = ${username}`;
+        const user = userResult.recordset[0];
+
+        if (!user) {
+            return res.status(400).json({ message: 'Username atau Password salah!' });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.Password);
+
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Username atau Password salah!' });
+        }
+
+        const token = jwt.sign(
+            { id: user.ID, username: user.Username }, 
+            SECRET_KEY, 
+            { expiresIn: '1h' }
+        );
+
+        res.json({ 
+            message: 'Login berhasil!', 
+            token: token,
+            username: user.Username,
+            nama: user.NamaLengkap
+        });
+
     } catch (err) {
         res.status(500).send(err.message);
     }
