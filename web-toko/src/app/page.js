@@ -51,6 +51,15 @@ export default function Home() {
               <div className="text-green-600 font-bold text-xl">
                 <span className='p-4'>Rp {item.Harga.toLocaleString()}</span>
                 <button
+                  onClick={() => (window.location.href = `/edit/${item.ID}`)}
+                  title="Edit"
+                  aria-label="Edit produk"
+                  className="bg-yellow-500 text-white p-2 rounded hover:bg-yellow-600 transition text-sm mr-2"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"></path><polygon points="18 2 22 6 12 16 8 16 8 12 18 2"></polygon></svg>
+                  <span className="sr-only">Hapus</span>
+                </button>
+                <button
                   onClick={() => handleDelete(item.ID)}
                   title="Hapus"
                   aria-label="Hapus produk"

@@ -57,4 +57,25 @@ app.delete('/api/products/:id', async (req, res) => {
     }
 });
 
+app.put('/api/products/:id', async (req, res) => {
+    const { id } = req.params;
+    const { nama, harga, stok } = req.body;
+    try {
+        await sql.query`UPDATE Products SET Nama = ${nama}, Harga = ${harga}, Stok = ${stok} WHERE ID = ${id}`;
+        res.json({ message: 'Produk berhasil diupdate' });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
+app.get('/api/products/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await sql.query`SELECT * FROM Products WHERE ID = ${id}`;
+        res.json(result.recordset[0]); 
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
 app.listen(3000, () => console.log('🚀 Server jalan di http://localhost:3000'));
