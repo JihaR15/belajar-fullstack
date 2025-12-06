@@ -12,7 +12,11 @@ export default function EditProduct() {
   const params = useParams();
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/products/${params.id}`)
+    fetch(`http://localhost:3000/api/products/${params.id}`, {
+      headers: {
+        "ngrok-skip-browser-warning": "true",
+    }
+    })
       .then(res => res.json())
       .then(data => {
         if (data) {
