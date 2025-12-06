@@ -47,4 +47,14 @@ app.post('/api/products', async (req, res) => {
     }
 });
 
+app.delete('/api/products/:id', async (req, res) => {
+    const { id } = req.params; 
+    try {
+        await sql.query`DELETE FROM Products WHERE ID = ${id}`;
+        res.json({ message: 'Produk berhasil dihapus' });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
+});
+
 app.listen(3000, () => console.log('🚀 Server jalan di http://localhost:3000'));

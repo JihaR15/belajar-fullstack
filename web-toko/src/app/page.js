@@ -5,15 +5,29 @@ import Link from 'next/link';
 export default function Home() {
   const [products, setProducts] = useState([]);
 
-  useEffect(() => {
+  // Fungsi untuk mengambil data (dipisah biar bisa dipanggil ulang)
+  const fetchProducts = () => {
     fetch('http://localhost:3000/api/products')
       .then((res) => res.json())
-      .then((data) => {
-        setProducts(data);
-        console.log("Data berhasil diambil:", data);
-      })
-      .catch((err) => console.error("Gagal ambil data:", err));
+      .then((data) => setProducts(data))
+      .catch((err) => console.error(err));
+  };
+
+  useEffect(() => {
+    fetchProducts();
   }, []);
+
+  // Fungsi Hapus
+  const handleDelete = async (id) => {
+    if (confirm('Yakin mau hapus produk ini?')) {
+      try {
+        await fetch(`http://localhost:3000/api/products/${id}`, { method: 'DELETE' });
+        fetchProducts(); // Refresh data otomatis setelah hapus
+      } catch (error) {
+        alert('Gagal menghapus');
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 p-10">
@@ -35,7 +49,18 @@ export default function Home() {
                 <p className="text-gray-500">Stok: {item.Stok}</p>
               </div>
               <div className="text-green-600 font-bold text-xl">
-                Rp {item.Harga.toLocaleString()}
+                <span className='p-4'>Rp {item.Harga.toLocaleString()}</span>
+                <button
+                  onClick={() => handleDelete(item.ID)}
+                  title="Hapus"
+                  aria-label="Hapus produk"
+                  className="bg-red-500 text-white p-2 rounded hover:bg-red-600 transition"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-6 0h6" />
+                  </svg>
+                  <span className="sr-only">Hapus</span>
+                </button>
               </div>
             </div>
           ))}
